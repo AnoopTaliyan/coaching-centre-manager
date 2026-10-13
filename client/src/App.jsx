@@ -6,6 +6,7 @@ import Dashboard from "./pages/Dashboard.jsx";
 import Students from "./pages/Students.jsx";
 import Fees from "./pages/Fees.jsx";
 import Attendance from "./pages/Attendance.jsx";
+import Receipt from "./pages/Receipt.jsx";
 
 function Private({ children }) {
   return auth.token ? children : <Navigate to="/login" replace />;
@@ -15,6 +16,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+      <Route path="/receipt/:id" element={<Private><Receipt /></Private>} />
       <Route element={<Private><Layout /></Private>}>
         <Route path="/" element={<Dashboard />} />
         <Route path="/students" element={<Students />} />

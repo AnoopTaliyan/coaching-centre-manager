@@ -98,3 +98,31 @@ td.right { text-align: right; } td.right .btn { margin-left: 6px; }
 .att.present { border-color: var(--primary); background: var(--soft); }
 .att.present .att-dot { background: var(--primary); border-color: var(--primary); color: var(--primary-ink); }
 .save-bar { position: sticky; bottom: 0; display: flex; justify-content: flex-end; align-items: center; gap: 14px; padding: 16px 0; margin-top: 16px; background: linear-gradient(transparent, var(--bg) 40%); }
+
+/* fees: confirmation after recording a payment */
+.success-bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding: 12px 16px; margin-bottom: 16px; border-color: var(--primary); background: var(--soft); }
+
+/* receipt */
+.receipt-page { max-width: 720px; margin: 0 auto; padding: 32px 16px; }
+.receipt-actions { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+.receipt { padding: 32px; display: grid; gap: 24px; }
+.receipt-head { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding-bottom: 20px; border-bottom: 2px solid var(--primary); }
+.receipt-head h2 { font-size: 1.3rem; margin-top: 10px; }
+.receipt-meta { display: grid; gap: 2px; text-align: right; font-size: .9rem; }
+.receipt-meta strong { letter-spacing: .1em; color: var(--primary); }
+.receipt-grid { display: grid; grid-template-columns: max-content 1fr; gap: 10px 24px; }
+.receipt-grid dt { color: var(--muted); }
+.receipt-grid dd { font-weight: 600; }
+.receipt-total { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-radius: 10px; background: var(--soft); }
+.receipt-total strong { font-size: 1.6rem; color: var(--ok); }
+.receipt-foot { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; padding-top: 32px; }
+.sign { border-top: 1px solid var(--border); padding-top: 6px; min-width: 180px; text-align: center; font-size: .85rem; color: var(--muted); }
+
+@media print {
+  :root { --bg: #fff; --surface: #fff; --text: #000; --muted: #555; --border: #ccc; --primary: #16a34a; --soft: #eef9f1; --ok: #15803d; }
+  .no-print { display: none !important; }
+  body { background: #fff; }
+  .receipt-page { padding: 0; }
+  .receipt { border: 1px solid #ccc; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}

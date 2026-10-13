@@ -2,10 +2,15 @@ import { Router } from "express";
 import mongoose from "mongoose";
 import Payment from "../models/Payment.js";
 import Student from "../models/Student.js";
+import User from "../models/User.js";
 import { wrap } from "../middleware/auth.js";
+import { currentMonth } from "../utils/dates.js";
 
 const router = Router();
-export const currentMonth = () => new Date().toISOString().slice(0, 7);
+export { currentMonth };
+
+// Short, human-friendly receipt number derived from the payment id
+export const receiptNo = p => "R-" + String(p._id).slice(-6).toUpperCase();
 
 // Fee status of every active student for a month
 export async function feeStatus(ownerId, month) {
@@ -31,7 +36,8 @@ router.get(
     const filter = { owner: req.userId };
     if (req.query.month) filter.month = req.query.month;
     if (req.query.student) filter.student = req.query.student;
-    res.json(await Payment.find(filter).populate("student", "name batch").sort({ paidOn: -1 }));
+    const list = await Payment.find(filter).populate("student", "name batch").sort({ paidOn: -1 }).lean();
+    res.json(list.map(p => ({ ...p, receiptNo: receiptNo(p) })));
   })
 );
 
@@ -40,6 +46,19 @@ router.get(
   "/status",
   wrap(async (req, res) => {
     res.json(await feeStatus(req.userId, req.query.month || currentMonth()));
+  })
+);
+
+// GET /api/payments/:id  -> one payment with student + centre details (for the receipt)
+router.get(
+  "/:id",
+  wrap(async (req, res) => {
+    const payment = await Payment.findOne({ _id: req.params.id, owner: req.userId })
+      .populate("student", "name batch phone parentPhone monthlyFee")
+      .lean();
+    if (!payment) return res.status(404).json({ error: "Payment not found" });
+    const centre = await User.findById(req.userId, "centreName email").lean();
+    res.json({ ...payment, receiptNo: receiptNo(payment), centre });
   })
 );
 
@@ -52,7 +71,7 @@ router.post(
     const payment = await Payment.create({
       owner: req.userId, student, amount, month: month || currentMonth(), mode, paidOn, note,
     });
-    res.status(201).json(payment);
+    res.status(201).json({ ...payment.toObject(), receiptNo: receiptNo(payment) });
   })
 );
 

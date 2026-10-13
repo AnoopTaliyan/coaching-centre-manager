@@ -1,0 +1,20 @@
+# Render Blueprint: deploys the API with one click
+# (Render dashboard -> New -> Blueprint -> pick this repo)
+services:
+  - type: web
+    name: coaching-centre-api
+    runtime: node
+    plan: free
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: MONGO_URI
+        sync: false          # paste your MongoDB Atlas connection string
+      - key: JWT_SECRET
+        generateValue: true  # Render creates a random secret for you
+      - key: CLIENT_URL
+        sync: false          # your Netlify URL, e.g. https://my-coaching.netlify.app
+      - key: TIMEZONE
+        value: Asia/Kolkata

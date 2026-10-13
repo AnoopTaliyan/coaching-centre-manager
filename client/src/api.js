@@ -45,13 +45,34 @@ export const rupees = n => "₹" + Number(n || 0).toLocaleString("en-IN");
 export const monthLabel = m =>
   new Date(m + "-01").toLocaleDateString("en-IN", { month: "long", year: "numeric" });
 
-// WhatsApp link with a pre-filled fee reminder (no API key needed)
-export function whatsappReminder({ student, due, month, centreName }) {
-  const phone = (student.parentPhone || student.phone || "").replace(/\D/g, "");
+// WhatsApp links with pre-filled messages (no API key needed)
+function waLink(student, text) {
+  const phone = (student?.parentPhone || student?.phone || "").replace(/\D/g, "");
   if (!phone) return null;
   const number = phone.length === 10 ? "91" + phone : phone;
-  const text =
-    `Namaste! ${student.name} ki ${monthLabel(month)} ki fees ${rupees(due)} abhi pending hai. ` +
-    `Kripya jald jama karein. Dhanyavaad – ${centreName}`;
   return `https://wa.me/${number}?text=${encodeURIComponent(text)}`;
 }
+
+export function whatsappReminder({ student, due, month, centreName }) {
+  return waLink(student,
+    `Namaste! ${student.name} ki ${monthLabel(month)} ki fees ${rupees(due)} abhi pending hai. ` +
+    `Kripya jald jama karein. Dhanyavaad – ${centreName}`);
+}
+
+export function whatsappThanks({ student, amount, month, receiptNo, centreName }) {
+  return waLink(student,
+    `Namaste! ${student.name} ki ${monthLabel(month)} ki fees ${rupees(amount)} prapt ho gayi hai ` +
+    `(Receipt ${receiptNo}). Dhanyavaad – ${centreName}`);
+}
+
+// Download rows as a CSV file that opens in Excel
+export function downloadCSV(filename, header, rows) {
+  const cell = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
+  const csv = [header, ...rows].map(r => r.map(cell).join(",")).join("\r\n");
+  const url = URL.createObjectURL(new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" }));
+  const a = Object.assign(document.createElement("a"), { href: url, download: filename });
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
+
+export const modeLabel = m => ({ cash: "Cash", upi: "UPI", bank: "Bank", other: "Other" }[m] || m);

@@ -2,9 +2,10 @@ import { Router } from "express";
 import Attendance from "../models/Attendance.js";
 import Student from "../models/Student.js";
 import { wrap } from "../middleware/auth.js";
+import { today } from "../utils/dates.js";
 
 const router = Router();
-export const today = () => new Date().toISOString().slice(0, 10);
+export { today };
 
 // GET /api/attendance?date=2026-10-11&batch=A
 // Returns every active student of the batch with their present flag for that day.
